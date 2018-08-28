@@ -1,3 +1,7 @@
+# My notes on my journey to learn go
+
+![Alt text](https://monosnap.com/image/iihcQXz7takpv0wR235yRbfnPEdHOV.png)
+
 ## Every Go program is made up of packages
 
 Programs start running in package “main”—which must contain a `main` function:
@@ -19,18 +23,25 @@ func main() {
 Packages are referred to using the last name in their import path, so `fmt` and `rand`.
 `fmt` and `rand` are the names of the packages. The "math/rand" package comprises files that begin with the statement `package rand`.
 
-> `math` is a sort of namespace, the name of a folder?
+> `math` is a sort of namespace, and the name of a folder?
 
 Yes.
 
 Not only that, each package needs to have its own folder, even if it contains only one file.
 
-Locally, custom packages must be added to `~/go/src` to be found.
+Locally, custom packages must be added to `$GOPATH/src` to be found.
+
+```shell
+➜ echo $GOPATH
+/Users/carolineschnapp/Code/go
+```
+
+### Factored import statement
 
 ```go
 package main
 
-// That's called the factored import statement
+// That's called a factored import statement:
 import (
   "fmt"
   "math"
@@ -43,7 +54,9 @@ func main() {
 }
 ```
 
-You could end/separate each statement with a semicolon, like in Ruby, but it is frowned upon—unless statements are on the same line.
+## Semicolons
+
+You could end/separate each statement with a semicolon, like in Ruby, but it is frowned upon—unless statements are on the same line, for example when using `for`.
 
 ## The fmt package
 
@@ -66,7 +79,7 @@ In Go, a name is exported from a package only if it begins with a capital letter
 
 When importing a package, you can refer only to its exported names. Any "unexported" names are not accessible from outside the package.
 
-### That's why Println, Printf, Sqrt, and Intn begin with a capital letter.
+### That's why Println, Printf, Sqrt, and Intn begin with a capital letter
 
 ## Type à la Typescript
 
@@ -137,7 +150,7 @@ var foo = "bar"
 
 `fmt.Println` formats using the default formats for its operands and writes to **standard output**. Spaces are always added between operands and a newline is appended.
 
-## return values may be named
+## Return values may be named
 
 If so, they are treated as variables defined at the top of the function.
 
@@ -238,7 +251,9 @@ Strings must be wrapped in double quotes, not single quotes.
 
 ### Single quotes are used for rune literals
 
-**UTF-8 is a variable width character encoding capable of encoding all 1,112,064 valid code points in Unicode using one to four 8bit bytes.** (Read again until that sinks in.)
+**UTF-8 is a variable width character encoding capable of encoding all 1,112,064 valid code points in Unicode using 1 _to_ 4 8bit bytes.** (Read again until that sinks in.)
+
+4 * 8 bit = 32 bits, so we need an int32 to store an encoded UTF-8 character.
 
 `a` is a rune literal. A rune is a type, and it is an alias for int32. It occupies 32bit and is meant to represent a Unicode code point. As an analogy, the english characters set encoded in 'ASCII' has 128 code points. Thus is able to fit inside a byte (8bit). We need up to 4 bytes to store a Unicode character. The rune literal 'a' is actuality the number 97.
 
@@ -246,6 +261,8 @@ Strings must be wrapped in double quotes, not single quotes.
 var rune = 'a'
 fmt.Printf("This is a rune: %T %v %s\n", rune, rune, rune)
 // => This is a rune: int32 97 %!s(int32=97)
+fmt.Printf("Converted to a string: %s\n", string(rune))
+// => Converted to a string: a
 ```
 
 ## Variables
@@ -328,7 +345,6 @@ var foo = "bar"
 
 Before:
 
-
 ```go
 package main
 
@@ -363,7 +379,7 @@ func main() {
 
 > 1 2 3 true false no!
 
-## Types
+## Types, so far
 
 The types we have seen so far:
 
@@ -436,9 +452,10 @@ Variables declared without an explicit initial value are given a zero value.
 
 The zero value is:
 
-* `0` for numeric types,
-* `false` for the boolean type, and
-* `""` (the empty string) for strings
+* `0` for int,
+* `0` for float64,
+* `false` for the bool type, and
+* `""` (the empty string) for string
 
 ```go
 package main
@@ -468,8 +485,11 @@ Here is how you do it:
 
 ```go
 var i int = 42
+# => 42
 var f float64 = float64(i)
-var u uint = uint(f)
+# => 42
+var s string = string(i)
+# => "*"
 ```
 
 Or using `:=`:
@@ -477,7 +497,7 @@ Or using `:=`:
 ```go
 i := 42
 f := float64(i)
-u := uint(f)
+s := string(i)
 ```
 
 ## Type inference
@@ -504,7 +524,6 @@ Constants are declared like variables, but with the `const` keyword.
 Constants can be character, string, boolean, or numeric values.
 
 Constants cannot be declared using the := syntax.
-
 
 ```go
 package main
@@ -604,7 +623,7 @@ CTRL-C will stop the infinite loop.
 
 * `fmt.Sprint` formats using the default formats for its operands and **returns** the resulting string. Spaces are added between operands when neither is a string. It behaves a bit like the I/O equivalent `fmt.Println`. However, with `fmt.Println`, spaces are _always_ added between operands and a newline is appended, and nothing is returned. The result is output to standard output.
 
-* `fmt.Sprintf` formats according to a format specifier and returns the resulting string. It is the I/O equivalent of `fmt.Printf`
+* `fmt.Sprintf` formats according to a format specifier and returns the resulting string. It is the I/O equivalent of `fmt.Printf`, but returns the resulting string.
 
 ## Avant-goût of error handling
 
@@ -824,7 +843,6 @@ func main() {
 
 A sort of object with properties and methods can be created using `type` with `struct`, like so:
 
-
 ```go
 package main
 
@@ -886,7 +904,6 @@ func main() {
 
 To modify the original, you need to pass a pointer to the struct:
 
-
 ```go
 package main
 
@@ -913,3 +930,401 @@ func main() {
   // => {Caro Schnapp}
 }
 ```
+
+![Alt text](https://monosnap.com/image/7WVXZFlPZsi9kDl2eIQ2NtrCzZh8co.png)
+
+## Arrays
+
+An array has a fixed size, and all elements must be of the same type.
+
+Declared without initialization:
+
+```go
+var myArray[5]int
+fmt.Println(myArray)
+// => [0 0 0 0 0]
+```
+
+Declared with initialization:
+
+```go
+myOtherArray := [5]int{5, 6, 7, 8, 9}
+fmt.Println(myOtherArray)
+// => [5 6 7 8 9]
+```
+
+You can change the value at an index:
+
+```go
+var a[2]string
+a[0] = "Hello"
+a[1] = "World"
+fmt.Println(a[0], a[1])
+// => Hello World
+fmt.Println(a)
+// => [Hello World]
+```
+
+## Slices
+
+Slices references subsets of arrays. They are a “view into an array” says Go Tour.
+
+Their type is `[]T`.
+
+They need an array when initialized, or assigned to, unless they are “slice literals”:
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+  myArray := [6]int{2, 3, 5, 7, 11, 13}
+
+  var slice []int = myArray[1:4]
+  fmt.Println(slice)
+  // => [3 5 7]
+  slice[1] = 8
+  fmt.Println(slice)
+  // => [3 8 7]
+  slice = myArray[2:3]
+  fmt.Println(slice)
+  // => [8]
+  slice[0] = 78
+  fmt.Println(slice)
+  // => [78]
+  fmt.Println(myArray)
+  // => [2 3 78 7 11 13]
+}
+```
+
+![Alt text](https://monosnap.com/image/bzzyrpN0odyEQNSzQCm9rucev69bWZ.png)
+
+End index is **not** included.
+
+Start and end indices are 0-based, of course.
+
+Modify the slice content, and it will modify the referenced array.
+
+### Slices are like **references to arrays**
+
+A slice does not store any data, it just describes a section of an underlying array.
+
+Changing the elements of a slice modifies the corresponding elements of its underlying array.
+
+Other slices that share the same underlying array will see those changes.
+
+### Slice literals versus arrays versus count-it-for-me-I-am-lazy arrays
+
+The type of a slice is `[]T`.
+
+The type of an array is `[n]T`.
+
+```go
+a := []int{2, 3, 5, 7, 11, 13} // This is a slice literal.
+fmt.Printf("Type: %T Value: %v\n", a, a)
+
+b := [6]int{2, 3, 5, 7, 11, 13} // This is an array.
+fmt.Printf("Type: %T Value: %v\n", b, b)
+
+c := [...]int{2, 3, 5, 7, 11, 13} // This is an array where we were too lazy to count.
+fmt.Printf("Type: %T Value: %v\n", c, c)
+```
+
+![Alt text](https://monosnap.com/image/7AQTpa75yndkDgZ31tn4VNiXpo8GS0.png)
+
+### What is a slice literal
+
+A slice literal is like an array literal without the length. It builds an array _and_ returns a slice that references it.
+
+### Slice default bounds
+
+When slicing, you may omit the high or low bounds to use their defaults instead.
+
+The default is zero for the low bound and the length of the slice for the high bound.
+
+All those are equivalent:
+
+```go
+a[0:10]
+a[:10]
+a[0:]
+a[:]
+```
+
+### Slicing a slice
+
+⚠️ If you slice a slice, you get less and less elements:
+
+```go
+func main() {
+  s := []int{2, 3, 5, 7, 11, 13} // Slice literal
+
+  s = s[1:4]
+  fmt.Println(s)
+  // => [3 5 7]
+
+  s = s[:2]
+  fmt.Println(s)
+  // => [3 5]
+
+  s = s[1:]
+  fmt.Println(s)
+  // => [5]
+}
+```
+
+## I need true randomness
+
+```go
+package main
+
+import (
+  "fmt"
+  "math/rand"
+  "time"
+)
+
+func main() {
+  // What we will use:
+  // - func Seed(seed int64)
+  // - func Intn(n int) int
+  // - func Now() Time
+  // - func (t Time) Unix() int64
+  var (
+    now time.Time
+    unixTime int64
+    randNumber int
+  )
+  now = time.Now()
+  unixTime = now.Unix() // Number of seconds since Thursday, January 1st, 1970.
+  rand.Seed(unixTime) // To get a different number every time we run the program.
+  randNumber = rand.Intn(100) + 1
+  fmt.Printf("Random number between 1 and 100 is %d.\n", randNumber)
+  // => Random number between 1 and 100 is 48.
+}
+```
+
+## User input
+
+```go
+package main
+
+import (
+  "bufio"
+  "fmt"
+  "log"
+  "math/rand"
+  "os"
+  "strconv"
+  "strings"
+  "time"
+)
+
+func main() {
+  // What we will use:
+  // - strings: func TrimSpace(s string) string
+  // - strconv: func Atoi(s string) (int, error)
+  // - io: to access the variable os.Stdin
+  // - bufio: func NewReader(rd io.Reader) *Reader
+  // - bufio: func (b *Reader) ReadString(delim byte) (string, error)
+  // - math/rand: func Seed(seed int64)
+  // - math/rand: func Intn(n int) int
+  // - time: func Now() Time
+  // - time: func (t Time) Unix() int64
+  randNumber := randomNumber()
+  // fmt.Printf("Random number between 1 and 100 is %d.\n", randNumber)
+  // => Random number between 1 and 100 is 48.
+  reader := bufio.NewReader(os.Stdin)
+  for i := 0; i < 10; i++ {
+    guess := guess(reader)
+    if guess == randNumber {
+      fmt.Println("You have guessed correctly!")
+      return
+    } else if guess < randNumber {
+      fmt.Println("Higher baby!")
+    } else {
+      fmt.Println("Lower baby!")
+    }
+  }
+  fmt.Println("You have ran out of guesses. Good day to you, Sir!")
+}
+
+func randomNumber() (randNumber int) {
+  now := time.Now()
+  unixTime := now.Unix() // Number of seconds since Thursday, January 1st, 1970.
+  rand.Seed(unixTime) // To get a different number every time we run the program.
+  randNumber = rand.Intn(100) + 1
+  return
+}
+
+func guess(reader *bufio.Reader) (guess int) {
+  fmt.Println("Can you guess which number it is?")
+  value, err := reader.ReadString('\n')
+  if err != nil {
+  log.Fatal(err)
+  }
+  trimmedString := strings.TrimSpace(value)
+  guess, err = strconv.Atoi(trimmedString)
+  if err != nil {
+  log.Fatal("You must enter a number!")
+  }
+  return
+}
+```
+
+## First and foremost, a slice is a reference to an array
+
+That's its first usefulness. It points to an array.
+
+```go
+package main
+
+import (
+  "fmt"
+  "strings"
+)
+
+func main() {
+  // An array
+  colors := [3]string{"red", "green", "blue"}
+  // Printing it
+  fmt.Println(colors)
+  // => [red green blue]
+  // Printing a slice of it
+  fmt.Println(colors[:])
+  // => [red green blue]
+  // Passing slice to method, in order to pass array by reference.
+  upperCaseFirstLetter(colors[:])
+  // Printing it again
+  fmt.Println(colors)
+  // => [Red Green Blue]
+}
+
+func upperCaseFirstLetter(colors []string) {
+  for i := 0; i < len(colors); i++ {
+    colors[i] = strings.Title(colors[i])
+  }
+}
+```
+
+The only time you're dealing with an array is when you create it with a size.
+
+Everything else is a slice.
+
+## The make function
+
+The make function allocates a zeroed array and returns a slice that refers to that array.
+
+```go
+a := make([]int, 5) // len(a)=5
+fmt.Println(a)
+// => [0 0 0 0 0]
+
+b := make([]string, 3) // len(a)=3
+fmt.Println(b)
+// => [   ]
+```
+
+## Writing to a file
+
+Writing "Hey Caro" to a file:
+
+```go
+func heyCaroToFile() (err error) {
+  var file *os.File
+  file, err = os.Create("/Users/carolineschnapp/caro.txt")
+  if err != nil {
+    return
+  }
+
+  defer file.Close()
+
+  _, err = io.WriteString(file, "Hey Caro")
+  return
+}
+```
+
+## Reading from a file
+
+Reading each line in a file to a slice, and returning the slice:
+
+```go
+package main
+
+import (
+  "bufio"
+  "fmt"
+  "log"
+  "os"
+)
+
+func main() {
+  var lines, err = readLinesfromFile("/Users/carolineschnapp/caro.txt")
+  if err != nil {
+    log.Fatal(err)
+  }
+  for i := 0; i < len(lines); i++ {
+    fmt.Printf("Line %d: %s\n", i, lines[i])
+  }
+}
+
+func readLinesfromFile(filepath string) (lines []string, err error) {
+  var file *os.File
+  file, err = os.Open(filepath)
+  if err != nil {
+    return
+  }
+  defer file.Close()
+
+  scanner := bufio.NewScanner(file)
+  for scanner.Scan() {
+    lines = append(lines, scanner.Text())
+  }
+  if scanner.Err() != nil {
+    err = scanner.Err()
+  }
+  return
+}
+```
+
+## When using append, you need to look at the returned value
+
+The `append` function works with slices, to append an element at the end of the slice.
+
+It does not mutate the slice, so you need to assign the returned value to the slice.
+
+I know, it's weird: [golang append() evaluated but not used](https://stackoverflow.com/a/45005304/9459399).
+
+Typical append usage is:
+
+```go
+a = append(a, x)
+```
+
+Example:
+
+```go
+scanner := bufio.NewScanner(file)
+for scanner.Scan() {
+  lines = append(lines, scanner.Text())
+}
+```
+
+It is a _variadic_ function because it may be invoked with 1 or more elements to append:
+
+```go
+a = append(a, x, y, z)
+```
+
+If the capacity of a is not large enough to fit the additional values, append allocates a new, sufficiently large underlying array that fits both the existing slice elements and the additional values. Otherwise, append re-uses the underlying array.
+
+## Reading and writing to files best stackoverflow answer
+
+https://stackoverflow.com/a/9739903/9459399
+
+## The bufio package
+
+The package bufio implements buffered I/O.
+
+Buffer say what? [Read this excellent article](https://medium.com/golangspec/introduction-to-bufio-package-in-golang-ad7d1877f762)
